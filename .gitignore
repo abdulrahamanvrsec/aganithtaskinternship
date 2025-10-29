@@ -1,0 +1,6 @@
+book-finder/node_modules/
+book-finder/dist/
+server/data/
+server/uploads/
+*.pyc
+__pycache__/
