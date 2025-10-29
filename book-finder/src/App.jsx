@@ -1,272 +1,283 @@
-// import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import AdminDashboard from "./components/AdminDashboard";
+import AdminLogin from "./components/AdminLogin";
+import LoginForm from "./components/LoginForm";
+import ProfileEditor from "./components/ProfileEditor";
+import RegistrationForm from "./components/RegistrationForm";
+import ShareProfileView from "./components/ShareProfileView";
+import VerifyAccount from "./components/VerifyAccount";
+import { API_BASE, fetchProfile } from "./api";
+import "./App.css";
 
-// function App() {
-//   const [query, setQuery] = useState("");
-//   const [books, setBooks] = useState([]);
-//   const [error, setError] = useState("");
-//   const [loading, setLoading] = useState(false);
-
-//   const searchBooks = async () => {
-//     if (!query.trim()) return;
-//     setLoading(true);
-//     setError("");
-//     setBooks([]);
-//     try {
-//       const res = await fetch(
-//         `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}`
-//       );
-//       const data = await res.json();
-//       if (!data.docs || data.docs.length === 0) {
-//         setError("No books found!");
-//       } else {
-//         setBooks(data.docs.slice(0, 12)); // show 12 results
-//       }
-//     } catch (err) {
-//       setError("Something went wrong. Please try again.");
-//     }
-//     setLoading(false);
-//   };
-
-//   // ✅ Trigger search on Enter key
-//   const handleKeyDown = (e) => {
-//     if (e.key === "Enter") {
-//       searchBooks();
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 flex flex-col items-center">
-//       {/* ✅ Banner Section */}
-//       <div
-//         className="w-full h-[300px] bg-cover bg-center"
-//         style={{ backgroundImage: "url('/banner.jpeg')" }}
-//       ></div>
-
-//       {/* ✅ Title & Description */}
-//       <div className="text-center px-6 mt-8">
-//         <h1 className="text-5xl font-extrabold mb-4 text-gray-900 drop-shadow">
-//           BookFinder
-//         </h1>
-//         <p className="text-lg max-w-2xl mx-auto text-gray-700">
-//           Discover Your Next Literary Adventure <br />
-//           Explore millions of books from around the world with our intelligent
-//           search engine.
-//         </p>
-//         <div className="flex justify-center gap-8 text-sm font-medium mt-6 text-gray-800">
-//           <p>
-//             <span className="font-bold">1M+</span> Books
-//           </p>
-//           <p>
-//             <span className="font-bold">100K+</span> Authors
-//           </p>
-//           <p>
-//             <span className="font-bold">50+</span> Languages
-//           </p>
-//         </div>
-//       </div>
-
-//       {/* ✅ Modern Search Box */}
-//       <div className="flex justify-center px-4 mt-12 mb-10 w-full">
-//         <div className="w-full max-w-3xl flex items-center bg-white bg-opacity-90 backdrop-blur-md rounded-full shadow-xl p-4 transition transform hover:scale-[1.01]">
-//           <input
-//             type="text"
-//             placeholder="🔎 Search for your next favorite book..."
-//             value={query}
-//             onChange={(e) => setQuery(e.target.value)}
-//             onKeyDown={handleKeyDown}
-//             className="flex-1 px-6 py-5 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none text-lg rounded-full"
-//           />
-
-//           {/* ✅ Uiverse.io Button */}
-//           <button
-//             type="button"
-//             onClick={searchBooks}
-//             className="[--background:#000000] [--color:#ffffff] [--muted:#242424] [--muted-foreground:#9c9c9c] [--border:#2e2e2e] relative inline-flex items-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-[--border] bg-[--background] hover:bg-[--muted] text-[--muted-foreground] hover:text-[--color] px-6 py-4 justify-center rounded-full text-base font-medium shadow-md h-12 w-40 ml-4"
-//           >
-//             <span className="hidden lg:inline-flex">Search Books</span>
-//             <span className="inline-flex lg:hidden">Search</span>
-//             <kbd className="pointer-events-none absolute right-2 top-2 flex h-5 select-none items-center gap-1 rounded border border-[--border] bg-[--muted] px-1.5 font-mono text-[10px] font-medium opacity-100 [&_span]:text-xs">
-            
-//             </kbd>
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* ✅ Messages */}
-//       {loading && <p className="text-gray-600 text-lg mb-6">🔍 Searching...</p>}
-//       {error && <p className="text-red-500 text-lg mb-6">{error}</p>}
-
-//       {/* ✅ Results */}
-//       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 w-full max-w-6xl px-4">
-//         {books.map((book, idx) => (
-//           <div
-//             key={idx}
-//             className="bg-white rounded-2xl shadow-lg hover:shadow-2xl p-6 flex flex-col items-center text-center transition transform hover:scale-105"
-//           >
-//             <img
-//               src={
-//                 book.cover_i
-//                   ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
-//                   : "/banner.jpeg" // fallback
-//               }
-//               alt={book.title}
-//               className="w-36 h-52 object-cover mb-4 rounded-lg shadow-md"
-//             />
-//             <h2 className="font-semibold text-lg text-gray-800 mb-2 line-clamp-2">
-//               {book.title}
-//             </h2>
-//             <p className="text-sm text-gray-600 mb-1">
-//               {book.author_name
-//                 ? book.author_name.join(", ")
-//                 : "Unknown Author"}
-//             </p>
-//             <p className="text-sm text-gray-500">
-//               First Published: {book.first_publish_year || "N/A"}
-//             </p>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-
-
-import { useState } from "react";
+const VIEWS = {
+  LANDING: "landing",
+  REGISTER: "register",
+  LOGIN: "login",
+  VERIFY: "verify",
+  PROFILE: "profile",
+  ADMIN_LOGIN: "admin-login",
+  ADMIN_PANEL: "admin-panel",
+  SHARE: "share",
+};
 
 function App() {
-  const [query, setQuery] = useState("");
-  const [books, setBooks] = useState([]);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [view, setView] = useState(VIEWS.LANDING);
+  const [userToken, setUserToken] = useState(() => localStorage.getItem("socrp_user_token"));
+  const [adminToken, setAdminToken] = useState(() => localStorage.getItem("socrp_admin_token"));
+  const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [shareToken, setShareToken] = useState(null);
 
-  const searchBooks = async () => {
-    if (!query.trim()) return;
-    setLoading(true);
-    setError("");
-    setBooks([]);
+  useEffect(() => {
+    const { pathname } = window.location;
+    if (pathname.startsWith("/share/")) {
+      const token = pathname.replace("/share/", "");
+      setShareToken(token);
+      setView(VIEWS.SHARE);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userToken) {
+      loadProfile();
+    } else {
+      setProfile(null);
+    }
+  }, [userToken]);
+
+  const loadProfile = async () => {
     try {
-      const res = await fetch(
-        `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}`
-      );
-      const data = await res.json();
-      if (!data.docs || data.docs.length === 0) {
-        setError("No books found!");
-      } else {
-        setBooks(data.docs.slice(0, 12)); // show 12 results
-      }
+      setProfileLoading(true);
+      const response = await fetchProfile(userToken);
+      setProfile(response.profile);
+      setView(VIEWS.PROFILE);
     } catch (err) {
-      setError("Something went wrong. Please try again.");
-    }
-    setLoading(false);
-  };
-
-  // ✅ Trigger search on Enter key
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      searchBooks();
+      console.error(err);
+    } finally {
+      setProfileLoading(false);
     }
   };
 
-  return (
-    <div
-      className={`min-h-screen flex flex-col items-center transition-colors duration-700 
-      ${
-        books.length > 0
-          ? "bg-gradient-to-br from-blue-50 via-indigo-100 to-blue-200"
-          : "bg-white"
-      }`}
-    >
-      {/* ✅ Banner Section */}
-      <div
-        className="w-full h-[300px] bg-cover bg-center"
-        style={{ backgroundImage: "url('/banner.jpeg')" }}
-      ></div>
+  const handleLogout = () => {
+    setUserToken(null);
+    localStorage.removeItem("socrp_user_token");
+    setProfile(null);
+    setView(VIEWS.LANDING);
+  };
 
-      {/* ✅ Title & Description */}
-      <div className="text-center px-6 mt-8">
-        <h1 className="text-5xl font-extrabold mb-4 text-gray-900 drop-shadow">
-          BookFinder
-        </h1>
-        <p className="text-lg max-w-2xl mx-auto text-gray-700">
-          Discover Your Next Literary Adventure <br />
-          Explore millions of books from around the world with our intelligent
-          search engine.
+  const handleAdminLogout = () => {
+    setAdminToken(null);
+    localStorage.removeItem("socrp_admin_token");
+    setView(VIEWS.LANDING);
+  };
+
+  const heroContent = useMemo(
+    () => (
+      <header className="text-center py-12 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-3xl shadow-lg">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">SOCRP Certification & Membership System</h1>
+        <p className="max-w-2xl mx-auto text-lg opacity-90">
+          Empower candidates to showcase verified professional profiles and enable administrators to manage memberships with ease.
         </p>
-        <div className="flex justify-center gap-8 text-sm font-medium mt-6 text-gray-800">
-          <p>
-            <span className="font-bold">1M+</span> Books
-          </p>
-          <p>
-            <span className="font-bold">100K+</span> Authors
-          </p>
-          <p>
-            <span className="font-bold">50+</span> Languages
-          </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-4 text-sm">
+          <span className="px-4 py-2 bg-white/20 rounded-full">Automated Membership IDs</span>
+          <span className="px-4 py-2 bg-white/20 rounded-full">Email Verification</span>
+          <span className="px-4 py-2 bg-white/20 rounded-full">Unlimited Education & Experience</span>
+          <span className="px-4 py-2 bg-white/20 rounded-full">Shareable Profile Links</span>
         </div>
-      </div>
-
-      {/* ✅ Modern Search Box */}
-      <div className="flex justify-center px-4 mt-12 mb-10 w-full">
-        <div className="w-full max-w-3xl flex items-center bg-white bg-opacity-90 backdrop-blur-md rounded-full shadow-xl p-4 transition transform hover:scale-[1.01]">
-          <input
-            type="text"
-            placeholder="🔎 Search for your next favorite book..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="flex-1 px-6 py-5 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none text-lg rounded-full"
-          />
-
-          <button
-            type="button"
-            onClick={searchBooks}
-            className="[--background:#000000] [--color:#ffffff] [--muted:#242424] [--muted-foreground:#9c9c9c] [--border:#2e2e2e] relative inline-flex items-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-[--border] bg-[--background] hover:bg-[--muted] text-[--muted-foreground] hover:text-[--color] px-6 py-4 justify-center rounded-full text-base font-medium shadow-md h-12 w-40 ml-4"
-          >
-            <span className="hidden lg:inline-flex">Search Books</span>
-            <span className="inline-flex lg:hidden">Search</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ✅ Messages */}
-      {loading && <p className="text-gray-600 text-lg mb-6">🔍 Searching...</p>}
-      {error && <p className="text-red-500 text-lg mb-6">{error}</p>}
-
-      {/* ✅ Results */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 w-full max-w-6xl px-4">
-        {books.map((book, idx) => (
-          <div
-            key={idx}
-            className="bg-white rounded-2xl shadow-lg hover:shadow-2xl p-6 flex flex-col items-center text-center transition transform hover:scale-105"
-          >
-            <img
-              src={
-                book.cover_i
-                  ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
-                  : "/banner.jpeg"
-              }
-              alt={book.title}
-              className="w-36 h-52 object-cover mb-4 rounded-lg shadow-md"
-            />
-            <h2 className="font-semibold text-lg text-gray-800 mb-2 line-clamp-2">
-              {book.title}
-            </h2>
-            <p className="text-sm text-gray-600 mb-1">
-              {book.author_name
-                ? book.author_name.join(", ")
-                : "Unknown Author"}
-            </p>
-            <p className="text-sm text-gray-500">
-              First Published: {book.first_publish_year || "N/A"}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
+      </header>
+    ),
+    []
   );
+
+  const featureMatrix = (
+    <section className="bg-white rounded-3xl shadow-xl p-8 mt-10">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6">Feature Matrix</h2>
+      <div className="overflow-auto">
+        <table className="min-w-full border border-gray-200 text-sm">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="border border-gray-200 px-4 py-2 text-left">Feature</th>
+              <th className="border border-gray-200 px-4 py-2 text-left">Member</th>
+              <th className="border border-gray-200 px-4 py-2 text-left">Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ["Registration", "Name, Email, Phone, Password, Photo, Resume", "View all registered users"],
+              ["Membership ID", "Auto-generated after verification", "View & edit"],
+              ["Email Verification", "Activate via link", "Monitor status"],
+              ["Profile Editing", "Update personal & professional info", "Override any field"],
+              ["Education", "Add unlimited entries", "Edit any entry"],
+              ["Work Experience", "Add unlimited jobs", "Edit any job"],
+              ["Skills & Languages", "Manage lists", "Edit lists"],
+              ["Resume Upload", "Upload/update anytime", "View/replace"],
+              ["Profile Photo", "Update photo", "Replace if needed"],
+              ["Profile Preview", "See full preview", "View all details"],
+              ["Profile Sharing", "Generate temporary links", "Monitor usage"],
+              ["Employer View", "Photo, education, experience, resume", "Track access logs"],
+              ["Blocking", "Cannot block", "Block/unblock"],
+              ["Dashboard", "View own profile", "Stats & table"],
+            ].map(([feature, member, admin]) => (
+              <tr key={feature} className="odd:bg-white even:bg-gray-50">
+                <td className="border border-gray-200 px-4 py-2 font-medium text-gray-900">{feature}</td>
+                <td className="border border-gray-200 px-4 py-2 text-gray-700">{member}</td>
+                <td className="border border-gray-200 px-4 py-2 text-gray-700">{admin}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+
+  const renderView = () => {
+    if (view === VIEWS.SHARE && shareToken) {
+      return (
+        <main className="min-h-screen bg-slate-100 py-10 px-4">
+          <ShareProfileView token={shareToken} />
+        </main>
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-slate-100 py-12 px-4">
+        <div className="max-w-6xl mx-auto space-y-10">
+          {heroContent}
+          <nav className="flex flex-wrap justify-center gap-3 text-sm">
+            <button className="nav-pill" onClick={() => setView(VIEWS.REGISTER)}>
+              Register
+            </button>
+            <button className="nav-pill" onClick={() => setView(VIEWS.LOGIN)}>
+              Member Login
+            </button>
+            <button className="nav-pill" onClick={() => setView(VIEWS.VERIFY)}>
+              Verify Email
+            </button>
+            <button className="nav-pill" onClick={() => setView(VIEWS.ADMIN_LOGIN)}>
+              Admin Login
+            </button>
+            <a
+              href={`${API_BASE}/api/verify?token=`}
+              className="nav-pill"
+              target="_blank"
+              rel="noreferrer"
+            >
+              API: Verify Endpoint
+            </a>
+          </nav>
+
+          {view === VIEWS.REGISTER && <RegistrationForm onSwitchToLogin={() => setView(VIEWS.LOGIN)} />}
+          {view === VIEWS.LOGIN && (
+            userToken ? (
+              <div className="bg-white rounded-xl shadow p-6 text-center">
+                <p className="text-gray-700 mb-4">You are already signed in.</p>
+                <div className="flex gap-3 justify-center">
+                  <button className="primary-btn" onClick={() => setView(VIEWS.PROFILE)}>
+                    Go to Profile
+                  </button>
+                  <button className="secondary-btn" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <LoginForm
+                onSuccess={(token) => {
+                  localStorage.setItem("socrp_user_token", token);
+                  setUserToken(token);
+                  setView(VIEWS.PROFILE);
+                }}
+                onSwitchToRegister={() => setView(VIEWS.REGISTER)}
+              />
+            )
+          )}
+
+          {view === VIEWS.VERIFY && <VerifyAccount />}
+
+          {view === VIEWS.PROFILE && (
+            userToken ? (
+              profileLoading ? (
+                <div className="bg-white rounded-xl shadow p-6 text-center">Loading profile...</div>
+              ) : profile ? (
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold text-gray-900">Member Workspace</h2>
+                    <button className="secondary-btn" onClick={handleLogout}>
+                      Logout
+                    </button>
+                  </div>
+                  <ProfileEditor token={userToken} profile={profile} onRefresh={loadProfile} />
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl shadow p-6 text-center">
+                  <p className="text-gray-700">We couldn't load your profile. Try signing in again.</p>
+                  <button className="primary-btn mt-4" onClick={() => setView(VIEWS.LOGIN)}>
+                    Back to Login
+                  </button>
+                </div>
+              )
+            ) : (
+              <div className="bg-white rounded-xl shadow p-6 text-center">
+                <p className="text-gray-700">Please sign in to manage your profile.</p>
+                <button className="primary-btn mt-4" onClick={() => setView(VIEWS.LOGIN)}>
+                  Member Login
+                </button>
+              </div>
+            )
+          )}
+
+          {view === VIEWS.ADMIN_LOGIN && (
+            adminToken ? (
+              <div className="bg-white rounded-xl shadow p-6 text-center">
+                <p className="text-gray-700 mb-4">You are already authenticated as an administrator.</p>
+                <div className="flex gap-3 justify-center">
+                  <button className="primary-btn" onClick={() => setView(VIEWS.ADMIN_PANEL)}>
+                    Go to Admin Panel
+                  </button>
+                  <button className="secondary-btn" onClick={handleAdminLogout}>
+                    Logout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <AdminLogin
+                onSuccess={(token) => {
+                  localStorage.setItem("socrp_admin_token", token);
+                  setAdminToken(token);
+                  setView(VIEWS.ADMIN_PANEL);
+                }}
+              />
+            )
+          )}
+
+          {view === VIEWS.ADMIN_PANEL && (
+            adminToken ? (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-semibold text-gray-900">Admin Control Center</h2>
+                  <button className="secondary-btn" onClick={handleAdminLogout}>
+                    Logout
+                  </button>
+                </div>
+                <AdminDashboard token={adminToken} />
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl shadow p-6 text-center">
+                <p className="text-gray-700">Admin session expired. Please sign in again.</p>
+                <button className="primary-btn mt-4" onClick={() => setView(VIEWS.ADMIN_LOGIN)}>
+                  Admin Login
+                </button>
+              </div>
+            )
+          )}
+
+          {featureMatrix}
+        </div>
+      </div>
+    );
+  };
+
+  return renderView();
 }
 
 export default App;
